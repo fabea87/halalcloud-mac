@@ -18,7 +18,7 @@ jobs:
     runs-on: macos-26
     env:
       TAP_REPO: ${{ github.repository_owner }}/homebrew-halalcloud
-      TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+      TAP_DEPLOY_KEY: ${{ secrets.TAP_DEPLOY_KEY }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -72,15 +72,20 @@ jobs:
             --generate-notes
 
       - name: Update Homebrew tap
-        if: env.TAP_TOKEN != ''
+        if: env.TAP_DEPLOY_KEY != ''
         env:
           VERSION: ${{ steps.version.outputs.version }}
           SHA256: ${{ steps.package.outputs.sha256 }}
         run: |
           set -euo pipefail
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$TAP_DEPLOY_KEY" > "$HOME/.ssh/tap_deploy"
+          chmod 600 "$HOME/.ssh/tap_deploy"
+          ssh-keyscan -t ed25519,ecdsa,rsa github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/tap_deploy -o IdentitiesOnly=yes"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git clone "https://x-access-token:${TAP_TOKEN}@github.com/${TAP_REPO}.git" tap
+          git clone "git@github.com:${TAP_REPO}.git" tap
           ./scripts/update-cask.sh "${VERSION}" "${SHA256}" tap "${GITHUB_REPOSITORY}"
           cd tap
           git add Casks/halalcloud.rb

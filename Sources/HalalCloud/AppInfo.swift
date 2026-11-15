@@ -12,7 +12,7 @@ enum AppInfo {
 
     /// The upstream Windows client links.
     static let websiteURL = URL(string: "https://2dland.cn/")!
-    static let repositoryURL = URL(string: "https://github.com/halalcloud/halalcloud-mac")!
+    static let repositoryURL = URL(string: "https://github.com/fabea87/halalcloud-mac")!
 
     static var versionString: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String

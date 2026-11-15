@@ -14,7 +14,7 @@ the same account with the same tokens.
 ## Install
 
 ```bash
-brew tap halalcloud/halalcloud
+brew tap fabea87/halalcloud
 brew install --cask --no-quarantine halalcloud
 ```
 
@@ -88,20 +88,22 @@ docs/PROTOCOL.md           the Open API as used by the clients
 ## Releasing
 
 `v*` tags trigger `.github/workflows/release.yml`, which builds a universal
-`HalalCloud.app`, zips it, publishes a GitHub release, and (if
-`TAP_GITHUB_TOKEN` is set) commits the updated cask to
-`<owner>/homebrew-halalcloud`.
+`HalalCloud.app`, zips it, publishes a GitHub release, and commits the updated
+cask to `<owner>/homebrew-halalcloud` using the `TAP_DEPLOY_KEY` secret (an
+ed25519 deploy key with write access to the tap repository).
 
 ```bash
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-Create the tap repository once:
+One-time tap setup:
 
 ```bash
 gh repo create homebrew-halalcloud --public
-# with a fine-grained token that can push to it:
-gh secret set TAP_GITHUB_TOKEN --repo <owner>/halalcloud-mac
+ssh-keygen -t ed25519 -N "" -C "halalcloud-mac release workflow" -f tapkey
+gh repo deploy-key add tapkey.pub --repo <owner>/homebrew-halalcloud \
+  --title "release workflow" --allow-write
+gh secret set TAP_DEPLOY_KEY --repo <owner>/halalcloud-mac < tapkey
 ```
 
 ### Signing and notarization
