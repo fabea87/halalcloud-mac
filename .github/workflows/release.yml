@@ -20,7 +20,7 @@ jobs:
       TAP_REPO: ${{ github.repository_owner }}/homebrew-halalcloud
       TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

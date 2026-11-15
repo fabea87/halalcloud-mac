@@ -3,8 +3,8 @@ import XCTest
 
 final class SignerTests: XCTestCase {
 
-    // Vector computed with an independent Python implementation of the
-    // Windows client's HL6 signing code (HccApi.cpp).
+    // Vector cross-checked against HccApi.cpp: the canonical request contains
+    // a blank line after the API path and after the header block.
     private let nonce = "3f2504e0-4f89-11d3-9a0c-0305e82c3301"
     private let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
 
@@ -25,6 +25,7 @@ final class SignerTests: XCTestCase {
         let expected = """
         POST
         /v6/user/get
+
         content-type:application/json; charset=utf-8
         host:openapi.2dland.cn
         x-hl-nonce:\(nonce)
@@ -53,7 +54,7 @@ final class SignerTests: XCTestCase {
             "HL6-HMAC-SHA256 "
                 + "Credential=puc_5_dcpqfdvu8qnt_v1/2023-11-14/TESTTOKEN/hl6_request,"
                 + "SignedHeaders=content-type;host;x-hl-nonce;x-hl-timestamp,"
-                + "Signature=f79738ff0178d83b767a53a854ac9cfc841cbebc3fd38dab80b012965534efe4")
+                + "Signature=cbfe8babc32602eef3b1115d640db53ae01182134c3f04e1aeb1e6549f715123")
         XCTAssertEqual(signature.httpHeaders["authorization"], signature.authorization)
         XCTAssertEqual(signature.httpHeaders["x-hl-timestamp"], "2023-11-14T22:13:20Z")
         XCTAssertNil(signature.httpHeaders["host"])
